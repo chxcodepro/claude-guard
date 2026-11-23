@@ -564,11 +564,11 @@ namespace IpGuard {
                 try {
                     pipe = new NamedPipeServerStream(SystemPolicy.PipeName,PipeDirection.InOut,64,PipeTransmissionMode.Byte,PipeOptions.Asynchronous,4096,4096,PipeAcl());
                     pipe.WaitForConnection(); NamedPipeServerStream connected = pipe;
-                    Background(() => GateSession(connected));
+                    Background(() => GateSession(connected),ThreadPriority.AboveNormal);
                 } catch(Exception e) { if(pipe != null) pipe.Dispose(); if(!quit) { Observe("启动门卫异常 · " + e.Message); Thread.Sleep(1000); } }
             }
         }
-        static void Background(Action action) { Thread thread = new Thread(() => action()); thread.IsBackground = true; thread.Start(); }
+        static void Background(Action action,ThreadPriority priority=ThreadPriority.Normal) { Thread thread = new Thread(() => action()); thread.IsBackground = true;thread.Priority=priority;thread.Start(); }
         bool CanInherit(NamedPipeServerStream pipe,string appId) {
             uint pid;
             Win32.Check(Win32.GetNamedPipeClientProcessId(pipe.SafePipeHandle,out pid),"无法核对启动来源");

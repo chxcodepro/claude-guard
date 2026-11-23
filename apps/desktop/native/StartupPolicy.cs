@@ -65,6 +65,7 @@ namespace IpGuard {
                 task.Settings.Enabled=true;task.Settings.StartWhenAvailable=true;
                 task.Settings.DisallowStartIfOnBatteries=false;task.Settings.StopIfGoingOnBatteries=false;
                 task.Settings.ExecutionTimeLimit="PT0S";task.Settings.MultipleInstances=2;
+                task.Settings.Priority=4;
                 dynamic trigger=task.Triggers.Create(9);trigger.UserId=SystemPolicy.Sid;trigger.Enabled=true;
                 dynamic action=task.Actions.Create(0);action.Path=Path.GetFullPath(executable);action.Arguments="--background";action.WorkingDirectory=Path.GetDirectoryName(executable);
                 folder.RegisterTaskDefinition(SystemPolicy.Owner,task,6,SystemPolicy.Sid,null,3,null);

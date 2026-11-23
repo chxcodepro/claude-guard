@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -9,6 +10,9 @@ namespace IpGuard {
             if(args.Length>0 && args[0].StartsWith("chrome-extension://",StringComparison.Ordinal)) return BrowserHost.Run(args[0]);
             if(args.Length>0 && args[0]=="egress-core") {try {return EgressCore.Run(args);} catch {return 1;}}
             try {
+                // Login tasks default to below-normal priority, which child processes inherit.
+                if(args.Length>0 && (args[0]=="guard" || args[0]=="gate" || args[0]=="package-gate"))
+                    using(Process current=Process.GetCurrentProcess()) current.PriorityClass=ProcessPriorityClass.Normal;
                 if(args.Length>0 && (args[0]=="guard" || args[0]=="version")) {
                     Console.SetIn(new StreamReader(Console.OpenStandardInput(),new UTF8Encoding(false)));
                     Console.SetOut(new StreamWriter(Console.OpenStandardOutput(),new UTF8Encoding(false)) { AutoFlush=true });

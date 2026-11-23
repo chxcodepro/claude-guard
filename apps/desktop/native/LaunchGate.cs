@@ -39,8 +39,9 @@ namespace IpGuard {
             }
             public void Begin(StreamReader reader) {
                 Interlocked.Exchange(ref verified,Stopwatch.GetTimestamp());
-                // A live session owns a blocking read for its entire lifetime.
-                Task.Factory.StartNew(()=>Read(reader),CancellationToken.None,TaskCreationOptions.LongRunning,TaskScheduler.Default);
+                // Lease traffic must stay schedulable while normal-priority build workers are busy.
+                Thread receiver=new Thread(()=>Read(reader)) {IsBackground=true,Priority=ThreadPriority.AboveNormal};
+                receiver.Start();
             }
             void Read(StreamReader reader) {
                 try { string line; while((line=reader.ReadLine())=="lease") Interlocked.Exchange(ref verified,Stopwatch.GetTimestamp()); }
